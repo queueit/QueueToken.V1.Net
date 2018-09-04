@@ -7,6 +7,6 @@ namespace QueueIT.QueueToken
         string Key { get; }
         double? Rank { get; }
         string GetCustomDataValue(String key);
-        string Serialize();
+        byte[] Serialize();
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using QueueIT.QueueToken;
+using QueueIT.QueueToken.Model;
 
 public interface IEnqueueToken
 {

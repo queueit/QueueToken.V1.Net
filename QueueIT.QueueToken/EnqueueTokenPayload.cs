@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
-using System.Text;
+using System.IO;
+using System.Runtime.Serialization.Json;
+using QueueIT.QueueToken.Model;
 
 namespace QueueIT.QueueToken
 {
@@ -36,6 +38,13 @@ namespace QueueIT.QueueToken
             this._customData.Add(customDataKey, customDataValue);
         }
 
+        public EnqueueTokenPayload(string key, double? rank, Dictionary<string, string> customData)
+        {
+            this.Key = key;
+            this.Rank = rank;
+            this._customData = customData;
+        }
+
         public string GetCustomDataValue(string key)
         {
             if (!_customData.ContainsKey(key))
@@ -43,65 +52,40 @@ namespace QueueIT.QueueToken
             return this._customData[key];
         }
 
-        public string Serialize()
+        public byte[] Serialize()
         {
-            bool addComma = false;
-
-            StringBuilder sb = new StringBuilder();
-            sb.Append("{");
-
-            if (this.Rank != null)
+            var jsonSerializer = new DataContractJsonSerializer(typeof(PayloadDto), new DataContractJsonSerializerSettings()
             {
-                sb.Append("\"r\":");
-                sb.Append(this.Rank);
-                addComma = true;
-            }
+                UseSimpleDictionaryFormat = true
+            });
 
-            if (this.Key != null)
+            var dto = new PayloadDto()
             {
-                if (addComma)
-                {
-                    sb.Append(",");
-                }
+                Key = Key,
+                Rank = Rank,
+                CustomData = _customData.Count > 0 ? _customData : null
+            };
 
-                sb.Append("\"k\":\"");
-                sb.Append(this.Key.Replace("\"", "\\\""));
-                sb.Append("\"");
-                addComma = true;
-            }
-
-            bool addCustomDataComma = false;
-            if (this._customData.Count > 0)
+            using (var stream = new MemoryStream())
             {
-                if (addComma)
-                {
-                    sb.Append(",");
-                }
-
-                sb.Append("\"cd\":{");
-
-                foreach (KeyValuePair<string, string> keyValuePair in _customData)
-                {
-                    if (addCustomDataComma)
-                    {
-                        sb.Append(",");
-                    }
-
-                    sb.Append("\"");
-                    sb.Append(keyValuePair.Key.Replace("\"", "\\\""));
-                    sb.Append("\":\"");
-                    sb.Append(keyValuePair.Value.Replace("\"", "\\\""));
-                    sb.Append("\"");
-                    addCustomDataComma = true;
-
-                }
-
-                sb.Append("}");
-                addComma = true;
+                jsonSerializer.WriteObject(stream, dto);
+                return stream.ToArray();   
             }
+        }
 
-            sb.Append("}");
-            return sb.ToString();
+        public static EnqueueTokenPayload Deserialize(byte[] input)
+        {
+            var jsonSerializer = new DataContractJsonSerializer(typeof(Model.PayloadDto), new DataContractJsonSerializerSettings()
+            {
+                UseSimpleDictionaryFormat = true
+            });
+
+            using (var stream = new MemoryStream(input))
+            {
+                var dto = jsonSerializer.ReadObject(stream) as Model.PayloadDto;
+
+                return new EnqueueTokenPayload(dto.Key, dto.Rank, dto.CustomData);
+            }
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text;
 using Xunit;
 
 namespace QueueIT.QueueToken.Tests
@@ -118,7 +119,7 @@ namespace QueueIT.QueueToken.Tests
                 .WithCustomData("key2", "Value2")
                 .WithCustomData("key3", "Value3")
                 .Generate();
-            String actualJson = ((EnqueueTokenPayload)instance).Serialize();
+            String actualJson = Encoding.UTF8.GetString(((EnqueueTokenPayload)instance).Serialize());
 
             Assert.Equal(expectedJson, actualJson);
         }
@@ -134,7 +135,7 @@ namespace QueueIT.QueueToken.Tests
                 .WithRank(0.456)
                 .WithCustomData("key1", "Value1")
                 .Generate();
-            String actualJson = ((EnqueueTokenPayload)instance).Serialize();
+            String actualJson = Encoding.UTF8.GetString(((EnqueueTokenPayload)instance).Serialize());
 
             Assert.Equal(expectedJson, actualJson);
         }
@@ -149,7 +150,7 @@ namespace QueueIT.QueueToken.Tests
                 .WithKey("myKey")
                 .WithRank(0.456)
                 .Generate();
-            String actualJson = ((EnqueueTokenPayload)instance).Serialize();
+            String actualJson = Encoding.UTF8.GetString(((EnqueueTokenPayload)instance).Serialize());
 
             Assert.Equal(expectedJson, actualJson);
         }
@@ -163,7 +164,7 @@ namespace QueueIT.QueueToken.Tests
                 .Enqueue()
                 .WithKey("myKey")
                 .Generate();
-            String actualJson = ((EnqueueTokenPayload)instance).Serialize();
+            String actualJson = Encoding.UTF8.GetString(((EnqueueTokenPayload)instance).Serialize());
 
             Assert.Equal(expectedJson, actualJson);
         }
@@ -177,7 +178,7 @@ namespace QueueIT.QueueToken.Tests
                 .Enqueue()
                 .WithKey("my\"Key")
                 .Generate();
-            String actualJson = ((EnqueueTokenPayload)instance).Serialize();
+            String actualJson = Encoding.UTF8.GetString(((EnqueueTokenPayload)instance).Serialize());
 
             Assert.Equal(expectedJson, actualJson);
         }
@@ -191,7 +192,7 @@ namespace QueueIT.QueueToken.Tests
                 .Enqueue()
                 .WithRank(0.456)
                 .Generate();
-            String actualJson = ((EnqueueTokenPayload)instance).Serialize();
+            String actualJson = Encoding.UTF8.GetString(((EnqueueTokenPayload)instance).Serialize());
 
             Assert.Equal(expectedJson, actualJson);
         }
@@ -205,7 +206,7 @@ namespace QueueIT.QueueToken.Tests
                 .Enqueue()
                 .WithCustomData("key1", "Value1")
                 .Generate();
-            String actualJson = ((EnqueueTokenPayload)instance).Serialize();
+            String actualJson = Encoding.UTF8.GetString(((EnqueueTokenPayload)instance).Serialize());
 
             Assert.Equal(expectedJson, actualJson);
         }
@@ -219,7 +220,7 @@ namespace QueueIT.QueueToken.Tests
                 .Enqueue()
                 .WithCustomData("ke\"y1", "Va\"lue1")
                 .Generate();
-            String actualJson = ((EnqueueTokenPayload)instance).Serialize();
+            String actualJson = Encoding.UTF8.GetString(((EnqueueTokenPayload)instance).Serialize());
 
             Assert.Equal(expectedJson, actualJson);
         }

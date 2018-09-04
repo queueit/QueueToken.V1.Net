@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
-using System.Security.Cryptography;
-using System.Text;
+using System.Runtime.Serialization.Json;
+using QueueIT.QueueToken.Model;
 
 namespace QueueIT.QueueToken
 {
@@ -9,15 +9,15 @@ namespace QueueIT.QueueToken
     {
         public string CustomerId { get; }
         public string EventId { get; }
-        public DateTime Issued { get; private set; }
+        public DateTime Issued { get; }
         public string TokenIdentifier { get; private set; }
+        public TokenVersion TokenVersion => TokenVersion.QT1;
+        public EncryptionType Encryption => EncryptionType.AES256;
+        public DateTime Expires { get; }
+        public IEnqueueTokenPayload Payload { get; }
         public string Token { get; private set; }
         public string Signature { get; private set; }
         public string SignedToken => Token + "." + Signature;
-        public TokenVersion TokenVersion => TokenVersion.QT1;
-        public EncryptionType Encryption => EncryptionType.AES256;
-        public DateTime Expires { get; private set; }
-        public IEnqueueTokenPayload Payload { get; }
 
         internal EnqueueToken(string customerId)
         {
@@ -54,13 +54,13 @@ namespace QueueIT.QueueToken
             Expires = token.Expires;
         }
 
-        internal EnqueueToken(string tokenIdentifier, string customerId, string eventId, DateTime issued, DateTime expires, IEnqueueTokenPayload payload)
+        internal EnqueueToken(string tokenIdentifier, string customerId, string eventId, DateTime issued, DateTime? expires, IEnqueueTokenPayload payload)
         {
             TokenIdentifier = tokenIdentifier;
             CustomerId = customerId;
             EventId = eventId;
             Issued = issued;
-            Expires = expires;
+            Expires = expires ?? DateTime.MaxValue;
             Payload = payload;
         }
 
@@ -69,96 +69,140 @@ namespace QueueIT.QueueToken
             if (resetTokenIdentifier)
                 TokenIdentifier = Guid.NewGuid().ToString();
 
-            var md5 = MD5.Create();
-            byte[] iv = md5.ComputeHash(Encoding.UTF8.GetBytes(TokenIdentifier));
-
+            var aes = new AesEncryption(secretKey, TokenIdentifier);
+            var sha = new ShaSignature(secretKey);
+            
             try
             {
                 string serialized = SerializeHeader() + ".";
                 if (Payload != null)
                 {
-                    string payloadJson = Payload.Serialize();
-                    serialized = serialized + SerializePayload(payloadJson, secretKey, iv);
+                    byte[] serializedJayload = Payload.Serialize();
+                    serialized = serialized + EncryptAndEncode(serializedJayload, aes);
                 }
                 Token = serialized;
 
-                var sha = SHA256.Create();
-                var computedHash = sha.ComputeHash(Encoding.UTF8.GetBytes(Token + secretKey));
-                Signature = Base64UrlEncoder.Encode(computedHash);
+                Signature = sha.GenerateSignature(Token);
             }
             catch (Exception ex)
             {
                 throw new TokenSerializationException(ex);
             }
+        }
 
+        public static IEnqueueToken Parse(string tokenString, string secretKey)
+        {
+            if (string.IsNullOrEmpty(secretKey))
+                throw new ArgumentException("Invalid secret key", nameof(secretKey));
+
+            if (string.IsNullOrEmpty(tokenString))
+                throw new ArgumentException("Invalid token", nameof(tokenString));
+
+            var tokenParts = tokenString.Split('.');
+            var headerPart = tokenParts[0];
+            var payloadPart = tokenParts[1];
+            var signaturePart = tokenParts[2];
+
+            if (string.IsNullOrEmpty(headerPart))
+                throw new ArgumentException("Invalid token", nameof(tokenString));
+            if (string.IsNullOrEmpty(signaturePart))
+                throw new ArgumentException("Invalid token", nameof(tokenString));
+
+            var token = headerPart + "." + payloadPart;
+
+            var sha = new ShaSignature(secretKey);
+            var signature = sha.GenerateSignature(token);
+
+            if (signature != signaturePart)
+                throw new InvalidSignatureException();
+
+            try
+            {
+                var headerModel = DeserializeHeader(headerPart);
+
+                var aes = new AesEncryption(secretKey, headerModel.TokenIdentifier);
+
+                EnqueueTokenPayload payload = null;
+                if (!string.IsNullOrEmpty(payloadPart))
+                {
+                    payload = DeserializePayload(payloadPart, aes);
+                }
+
+                return new EnqueueToken(
+                    headerModel.TokenIdentifier,
+                    headerModel.CustomerId,
+                    headerModel.EventId,
+                    DateTimeOffset.FromUnixTimeMilliseconds(headerModel.Issued).DateTime,
+                    headerModel.Expires.HasValue
+                        ? new DateTime?(DateTimeOffset.FromUnixTimeMilliseconds(headerModel.Expires.Value).DateTime)
+                        : null,
+                    payload)
+                {
+                    Token = token,
+                    Signature = signature
+                };
+            }
+            catch (Exception ex)
+            {
+                throw new TokenDeserializationException("Unable to deserialize token", ex);
+            }
+        }
+
+        private static EnqueueTokenPayload DeserializePayload(string input, AesEncryption aes)
+        {
+            var headerEncrypted = Base64UrlEncoding.Decode(input);
+            var decrypted = aes.DecryptPayload(headerEncrypted);
+            return EnqueueTokenPayload.Deserialize(decrypted);
+
+        }
+
+        private static HeaderDto DeserializeHeader(string input)
+        {
+            var jsonSerializer = new DataContractJsonSerializer(typeof(HeaderDto));
+
+            var headerJson = Base64UrlEncoding.Decode(input);
+
+            using (var stream = new MemoryStream(headerJson))
+            {
+                return jsonSerializer.ReadObject(stream) as HeaderDto;
+            }
         }
 
         private string SerializeHeader()
         {
-            StringBuilder sb = new StringBuilder();
-            sb.Append("{");
-            sb.Append("\"typ\":\"QT1\"");
-            sb.Append(",\"enc\":\"AES256\"");
-            sb.Append(",\"iss\":");
-            sb.Append((new DateTimeOffset(Issued)).ToUnixTimeMilliseconds());
-            if (Expires != DateTime.MaxValue)
+            var jsonSerializer = new DataContractJsonSerializer(typeof(HeaderDto));
+            var dto = new HeaderDto()
             {
-                sb.Append(",\"exp\":");
-                sb.Append((new DateTimeOffset(Expires)).ToUnixTimeMilliseconds());
-            }
-            sb.Append(",\"ti\":");
-            sb.Append(TokenIdentifier);
-            sb.Append(",\"c\":");
-            sb.Append(CustomerId);
-            if (EventId!= null)
-            {
-                sb.Append(",\"e\":\"");
-                sb.Append(EventId);
-                sb.Append("\"");
-            }
-            sb.Append("}");
+                CustomerId = CustomerId,
+                EventId = EventId,
+                TokenIdentifier = TokenIdentifier,
+                Issued = (new DateTimeOffset(Issued)).ToUnixTimeMilliseconds(),
+                Expires = Expires != null ? (long?)(new DateTimeOffset(Expires)).ToUnixTimeMilliseconds() : null,
+                Encryption = EncryptionType.AES256.ToString(),
+                TokenVersion = TokenVersion.QT1.ToString()
+            };
 
-            return Base64UrlEncoder.Encode(Encoding.UTF8.GetBytes(sb.ToString()));
+            using (var stream = new MemoryStream())
+            {
+                jsonSerializer.WriteObject(stream, dto);
+
+                return Base64UrlEncoding.Encode(stream.ToArray());
+            }
         }
 
-        private string SerializePayload(string input, string secretKey, byte[] iv) 
-        {   
-            try {
-                var sha = SHA256.Create();
-                var key = sha.ComputeHash(Encoding.UTF8.GetBytes(Token + secretKey));
-                byte[] encrypted = EncryptstringToBytes(input, key, iv);
+        private string EncryptAndEncode(byte[] input, AesEncryption aes)
+        {
+            try
+            {
+                byte[] encrypted = aes.Encrypt(input);
 
-                return Base64UrlEncoder.Encode(encrypted);
+                return Base64UrlEncoding.Encode(encrypted);
 
-            } catch (Exception ex) {
+            }
+            catch (Exception ex)
+            {
                 throw new TokenSerializationException(ex);
             }
-        }
-
-        private byte[] EncryptstringToBytes(string plainText, byte[] Key, byte[] iv)
-        {
-            byte[] encrypted;
-
-            using (Aes aesAlg = Aes.Create())
-            {
-                aesAlg.Key = Key;
-                aesAlg.IV = iv;
-
-                ICryptoTransform encryptor = aesAlg.CreateEncryptor(aesAlg.Key, aesAlg.IV);
-                using (MemoryStream msEncrypt = new MemoryStream())
-                {
-                    using (CryptoStream csEncrypt = new CryptoStream(msEncrypt, encryptor, CryptoStreamMode.Write))
-                    {
-                        using (StreamWriter swEncrypt = new StreamWriter(csEncrypt))
-                        {
-                            swEncrypt.Write(plainText);
-                        }
-                        encrypted = msEncrypt.ToArray();
-                    }
-                }
-            }
-            return encrypted;
-
         }
     }
 }
