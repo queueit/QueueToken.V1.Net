@@ -177,7 +177,7 @@ namespace QueueIT.QueueToken
                 EventId = EventId,
                 TokenIdentifier = TokenIdentifier,
                 Issued = (new DateTimeOffset(Issued)).ToUnixTimeMilliseconds(),
-                Expires = Expires != null ? (long?)(new DateTimeOffset(Expires)).ToUnixTimeMilliseconds() : null,
+                Expires = Expires == DateTime.MaxValue ? null : (long?)(new DateTimeOffset(Expires)).ToUnixTimeMilliseconds(),
                 Encryption = EncryptionType.AES256.ToString(),
                 TokenVersion = TokenVersion.QT1.ToString()
             };

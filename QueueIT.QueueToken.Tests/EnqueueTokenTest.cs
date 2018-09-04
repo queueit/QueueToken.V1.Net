@@ -164,6 +164,26 @@ namespace QueueIT.QueueToken.Tests
         }
 
         [Fact]
+        public void GenerateToken_MinimalHeader()
+        {
+            string expectedSignedToken =
+                "eyJ0eXAiOiJRVDEiLCJlbmMiOiJBRVMyNTYiLCJpc3MiOjE1MzQ3MjMyMDAwMDAsInRpIjoiYTIxZDQyM2EtNDNmZC00ODIxLTg0ZmEtNDM5MGY2YTJmZDNlIiwiYyI6InRpY2tldGFuaWEifQ..ChCRF4bTbt4zlOcvXLjQYouhgqgiNNNZqcci8VWoZIU";
+
+            EnqueueToken token = new EnqueueToken(
+                "a21d423a-43fd-4821-84fa-4390f6a2fd3e",
+                "ticketania",
+                null,
+                new DateTime(2018, 08, 20, 0, 0, 0, DateTimeKind.Utc),
+                null,
+                null);
+            token.Generate("5ebbf794-1665-4d48-80d6-21ac34be7faedf9e10b3-551a-4682-bb77-fee59d6355d6", false);
+
+            string actualSignedToken = token.SignedToken;
+
+            Assert.Equal(expectedSignedToken, actualSignedToken);
+        }
+
+        [Fact]
         public void Parse_WithoutPayload()
         {
             string signature = "nN4Q5wIYKktChsK1_UEuP_tjiZj9xYOd65iYv4E9hbY";
@@ -210,6 +230,29 @@ namespace QueueIT.QueueToken.Tests
             Assert.Equal(0.45678663514, enqueueToken.Payload.Rank);
             Assert.Equal("blue", enqueueToken.Payload.GetCustomDataValue("color"));
             Assert.Equal("medium", enqueueToken.Payload.GetCustomDataValue("size"));
+        }
+
+        [Fact]
+        public void Parse_MinimalHeader()
+        {
+            string signature = "ChCRF4bTbt4zlOcvXLjQYouhgqgiNNNZqcci8VWoZIU";
+            string token =
+                "eyJ0eXAiOiJRVDEiLCJlbmMiOiJBRVMyNTYiLCJpc3MiOjE1MzQ3MjMyMDAwMDAsInRpIjoiYTIxZDQyM2EtNDNmZC00ODIxLTg0ZmEtNDM5MGY2YTJmZDNlIiwiYyI6InRpY2tldGFuaWEifQ.";
+            string tokenString = token + "." + signature;
+
+            var enqueueToken = EnqueueToken.Parse(tokenString, "5ebbf794-1665-4d48-80d6-21ac34be7faedf9e10b3-551a-4682-bb77-fee59d6355d6");
+
+            Assert.Equal("a21d423a-43fd-4821-84fa-4390f6a2fd3e", enqueueToken.TokenIdentifier);
+            Assert.Equal("ticketania", enqueueToken.CustomerId);
+            Assert.Null(enqueueToken.EventId);
+            Assert.Equal(DateTime.MaxValue, enqueueToken.Expires);
+            Assert.Equal(new DateTime(2018, 08, 20, 0, 0, 0, DateTimeKind.Utc), enqueueToken.Issued);
+            Assert.Equal(signature, enqueueToken.Signature);
+            Assert.Equal(token, enqueueToken.Token);
+            Assert.Equal(tokenString, enqueueToken.SignedToken);
+            Assert.Equal(EncryptionType.AES256, enqueueToken.Encryption);
+            Assert.Equal(TokenVersion.QT1, enqueueToken.TokenVersion);
+            Assert.Null(enqueueToken.Payload);
         }
 
     }
