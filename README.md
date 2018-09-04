@@ -1,6 +1,6 @@
 >Download latest version from here: [![NuGet](https://img.shields.io/nuget/v/QueueIT.QueueToken.svg)](https://www.nuget.org/packages/QueueIT.QueueToken/)
 # Queue-it Queue Token SDK for .NET
-The Queue-it Queue Token SDK is used to ensure that end users cannot enter the queue without a valid token and to be a container which can car-ry sensitive user information from integrating system into the queue. The token can be issued by  It supports .NET Framework 4.0+.
+The Queue-it Queue Token SDK is used to ensure that end users cannot enter the queue without a valid token and to be a container which can car-ry sensitive user information from integrating system into the queue. The token can be issued by any application that supports .NET Standard 2.0+.
 ## The Token
 The token consists of two parts. Firstly, a header containing non-sensitive metadata. Secondly the payload of the token. Both header and payload are in JSON format.
 ### Token Header
