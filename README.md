@@ -37,6 +37,7 @@ The token consists of two parts. Firstly, a header containing non-sensitive meta
 
 ## Usage
 ```
+var secretKey = ...;
 var token = Token
     .Enqueue("ticketania")
     .WithPayload(Payload
@@ -47,7 +48,7 @@ var token = Token
 		.Generate())
     .WithEventId("demoevent")
     .WithValidity(60000)
-    .Generate("5ebbf794-1665-4d48-80d6-21ac34be7faedf9e10b3-551a-4682-bb77-fee59d6355d6");
+    .Generate(secretKey);
 ```
 
 ## Serialized Token
