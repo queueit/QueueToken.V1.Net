@@ -9,10 +9,10 @@ The token consists of two parts. Firstly, a header containing non-sensitive meta
   "typ": "QT1",
   "enc": "AES256",
   "iss": 1526464517,
-  "exp": 1526464817,
+  "exp": 1526524517,
   "ti": "159aba3e-55e1-4f54-b6ee-e5b943d7e885”,
   "c": "ticketania", 
-  "e": "someeventid”
+  "e": "demoevent”
 }
 ```
 - `typ`: The type of the token. Value must be “QFT1”. Required.
@@ -26,9 +26,9 @@ The token consists of two parts. Firstly, a header containing non-sensitive meta
 ### Token Payload
 ```
 { 
-  "r": 45,
+  "r": 0.4578,
   "k": "XKDI42W",
-  "cd": { "somekey": "somevalue" }
+  "cd": { "size": "medium" }
 }
 ```
 - `r`: The rank of the user. Must be a decimal value between 0 to <1. Used for determining the priority of the user. If no rank is provided the queue will assign a default rank (e.g. 0). Optional
@@ -42,7 +42,7 @@ var token = Token
     .Enqueue("ticketania")
     .WithPayload(Payload
 		.Enqueue()
-		.WithKey("user@email.com")
+		.WithKey("XKDI42W")
 		.WithRank(0.4578)
 		.WithCustomData("size", "medium")
 		.Generate())
