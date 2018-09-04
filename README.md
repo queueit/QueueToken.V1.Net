@@ -32,8 +32,8 @@ The token consists of two parts. Firstly, a header containing non-sensitive meta
 }
 ```
 - `r`: The rank of the user. Must be a decimal value between 0 to <1. Used for determining the priority of the user. If no rank is provided the queue will assign a default rank (e.g. 0). Optional
-- `k`: A unique key that holds value to the integrating system (e.g. email or user id). Used to restrict users from issuing multiple queue ids. Op-tional.
-- `cd`: Any custom data of the user. This is a set of key-value pairs. Op-tional
+- `k`: A unique key that holds value to the integrating system (e.g. email or user id). Used to restrict users from issuing multiple queue ids. Optional.
+- `cd`: Any custom data of the user. This is a set of key-value pairs. Optional
 
 ## Usage
 ```
@@ -49,6 +49,8 @@ var token = Token
     .WithEventId("demoevent")
     .WithValidity(60000)
     .Generate(secretKey);
+
+string signedToken = token.SignedToken;
 ```
 
 ## Serialized Token
