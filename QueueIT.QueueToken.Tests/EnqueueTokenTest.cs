@@ -183,7 +183,7 @@ namespace QueueIT.QueueToken.Tests
                 "eyJ0eXAiOiJRVDEiLCJlbmMiOiJBRVMyNTYiLCJpc3MiOjE1MzQ3MjMyMDAwMDAsImV4cCI6MTUzOTEyOTYwMDAwMCwidGkiOiJhMjFkNDIzYS00M2ZkLTQ4MjEtODRmYS00MzkwZjZhMmZkM2UiLCJjIjoidGlja2V0YW5pYSIsImUiOiJteWV2ZW50In0.";
             string tokenString = token + "." + signature;
 
-            var enqueueToken = EnqueueToken.Parse(tokenString, "5ebbf794-1665-4d48-80d6-21ac34be7faedf9e10b3-551a-4682-bb77-fee59d6355d6");
+            var enqueueToken = Token.Parse(tokenString, "5ebbf794-1665-4d48-80d6-21ac34be7faedf9e10b3-551a-4682-bb77-fee59d6355d6");
 
             Assert.Equal("a21d423a-43fd-4821-84fa-4390f6a2fd3e", enqueueToken.TokenIdentifier);
             Assert.Equal("ticketania", enqueueToken.CustomerId);
@@ -206,7 +206,7 @@ namespace QueueIT.QueueToken.Tests
                 "eyJ0eXAiOiJRVDEiLCJlbmMiOiJBRVMyNTYiLCJpc3MiOjE1MzQ3MjMyMDAwMDAsImV4cCI6MTUzOTEyOTYwMDAwMCwidGkiOiJhMjFkNDIzYS00M2ZkLTQ4MjEtODRmYS00MzkwZjZhMmZkM2UiLCJjIjoidGlja2V0YW5pYSIsImUiOiJteWV2ZW50In0.0rDlI69F1Dx4Twps5qD4cQrbXbCRiezBd6fH1PVm6CnVY456FALkAhN3rgVrh_PGCJHcEXN5zoqFg65MH8WZc_CQdD63hJre3Sedu0-9zIs";
             string tokenString = token + "." + signature;
 
-            var enqueueToken = EnqueueToken.Parse(tokenString, "5ebbf794-1665-4d48-80d6-21ac34be7faedf9e10b3-551a-4682-bb77-fee59d6355d6");
+            var enqueueToken = Token.Parse(tokenString, "5ebbf794-1665-4d48-80d6-21ac34be7faedf9e10b3-551a-4682-bb77-fee59d6355d6");
 
             Assert.Equal("a21d423a-43fd-4821-84fa-4390f6a2fd3e", enqueueToken.TokenIdentifier);
             Assert.Equal("ticketania", enqueueToken.CustomerId);
@@ -232,7 +232,7 @@ namespace QueueIT.QueueToken.Tests
                 "eyJ0eXAiOiJRVDEiLCJlbmMiOiJBRVMyNTYiLCJpc3MiOjE1MzQ3MjMyMDAwMDAsInRpIjoiYTIxZDQyM2EtNDNmZC00ODIxLTg0ZmEtNDM5MGY2YTJmZDNlIiwiYyI6InRpY2tldGFuaWEifQ.";
             string tokenString = token + "." + signature;
 
-            var enqueueToken = EnqueueToken.Parse(tokenString, "5ebbf794-1665-4d48-80d6-21ac34be7faedf9e10b3-551a-4682-bb77-fee59d6355d6");
+            var enqueueToken = Token.Parse(tokenString, "5ebbf794-1665-4d48-80d6-21ac34be7faedf9e10b3-551a-4682-bb77-fee59d6355d6");
 
             Assert.Equal("a21d423a-43fd-4821-84fa-4390f6a2fd3e", enqueueToken.TokenIdentifier);
             Assert.Equal("ticketania", enqueueToken.CustomerId);
