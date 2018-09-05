@@ -141,14 +141,6 @@ namespace QueueIT.QueueToken.Tests
             string expectedSignedToken =
                 "eyJ0eXAiOiJRVDEiLCJlbmMiOiJBRVMyNTYiLCJpc3MiOjE1MzQ3MjMyMDAwMDAsImV4cCI6MTUzOTEyOTYwMDAwMCwidGkiOiJhMjFkNDIzYS00M2ZkLTQ4MjEtODRmYS00MzkwZjZhMmZkM2UiLCJjIjoidGlja2V0YW5pYSIsImUiOiJteWV2ZW50In0..nN4Q5wIYKktChsK1_UEuP_tjiZj9xYOd65iYv4E9hbY";
 
-            IEnqueueTokenPayload payload = Payload
-                .Enqueue()
-                .WithKey("somekey")
-                .WithRank(0.45678663514)
-                .WithCustomData("color", "blue")
-                .WithCustomData("size", "medium")
-                .Generate();
-
             EnqueueToken token = new EnqueueToken(
                 "a21d423a-43fd-4821-84fa-4390f6a2fd3e",
                 "ticketania",
