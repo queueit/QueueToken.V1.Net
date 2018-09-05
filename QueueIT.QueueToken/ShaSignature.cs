@@ -12,11 +12,10 @@ namespace QueueIT.QueueToken
             _secretKey = secretKey;
         }
 
-        public string GenerateSignature(string tokenString)
+        public byte[] GenerateSignature(string tokenString)
         {
             var sha = SHA256.Create();
-            var computedHash = sha.ComputeHash(Encoding.UTF8.GetBytes(tokenString + _secretKey));
-            return Base64UrlEncoding.Encode(computedHash);
+            return sha.ComputeHash(Encoding.UTF8.GetBytes(tokenString + _secretKey));
         }
 
     }

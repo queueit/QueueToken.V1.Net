@@ -82,7 +82,7 @@ namespace QueueIT.QueueToken
                 }
                 Token = serialized;
 
-                Signature = sha.GenerateSignature(Token);
+                Signature = Base64UrlEncoding.Encode(sha.GenerateSignature(Token));
             }
             catch (Exception ex)
             {
@@ -111,7 +111,7 @@ namespace QueueIT.QueueToken
             var token = headerPart + "." + payloadPart;
 
             var sha = new ShaSignature(secretKey);
-            var signature = sha.GenerateSignature(token);
+            var signature = Base64UrlEncoding.Encode(sha.GenerateSignature(token));
 
             if (signature != signaturePart)
                 throw new InvalidSignatureException();
