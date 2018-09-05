@@ -220,8 +220,8 @@ namespace QueueIT.QueueToken.Tests
             Assert.Equal(TokenVersion.QT1, enqueueToken.TokenVersion);
             Assert.Equal("somekey", enqueueToken.Payload.Key);
             Assert.Equal(0.45678663514, enqueueToken.Payload.Rank);
-            Assert.Equal("blue", enqueueToken.Payload.GetCustomDataValue("color"));
-            Assert.Equal("medium", enqueueToken.Payload.GetCustomDataValue("size"));
+            Assert.Equal("blue", enqueueToken.Payload.GetCustomDataDictionary()["color"]);
+            Assert.Equal("medium", enqueueToken.Payload.GetCustomDataDictionary()["size"]);
         }
 
         [Fact]

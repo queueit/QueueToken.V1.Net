@@ -2,6 +2,7 @@
 using System.IO;
 using System.Runtime.Serialization.Json;
 using QueueIT.QueueToken.Model;
+using System.Linq;
 
 namespace QueueIT.QueueToken
 {
@@ -45,11 +46,9 @@ namespace QueueIT.QueueToken
             this._customData = customData;
         }
 
-        public string GetCustomDataValue(string key)
+        public Dictionary<string, string> GetCustomDataDictionary()
         {
-            if (!_customData.ContainsKey(key))
-                return null;
-            return this._customData[key];
+            return this._customData.ToDictionary(arg => arg.Key, arg2 => arg2.Value);
         }
 
         public byte[] Serialize()

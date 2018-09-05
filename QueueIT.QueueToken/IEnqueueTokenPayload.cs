@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace QueueIT.QueueToken
 {
@@ -6,7 +7,7 @@ namespace QueueIT.QueueToken
     {
         string Key { get; }
         double? Rank { get; }
-        string GetCustomDataValue(String key);
+        Dictionary<string, string> GetCustomDataDictionary();
         byte[] Serialize();
     }
 }
