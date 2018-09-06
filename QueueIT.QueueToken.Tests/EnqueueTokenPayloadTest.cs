@@ -17,7 +17,7 @@ namespace QueueIT.QueueToken.Tests
             String actualKey = instance.Key;
             Assert.Equal(expectedKey, actualKey);
             Assert.Null(instance.Rank);
-            Assert.Null(instance.GetCustomDataValue("key"));
+            Assert.False(instance.CustomData.ContainsKey("key"));
         }
 
         [Fact]
@@ -34,7 +34,7 @@ namespace QueueIT.QueueToken.Tests
             Double? actualRank = instance.Rank;
             Assert.Equal(expectedKey, actualKey);
             Assert.Equal(expectedRank, actualRank);
-            Assert.Null(instance.GetCustomDataValue("key"));
+            Assert.False(instance.CustomData.ContainsKey("key"));
         }
 
         [Fact]
@@ -51,7 +51,7 @@ namespace QueueIT.QueueToken.Tests
                 .Generate();
             String actualKey = instance.Key;
             Double? actualRank = instance.Rank;
-            String actualCustomData = instance.GetCustomDataValue("key");
+            String actualCustomData = instance.CustomData["key"];
             Assert.Equal(expectedKey, actualKey);
             Assert.Equal(expectedRank, actualRank);
             Assert.Equal(expectedCustomDataValue, actualCustomData);
@@ -67,11 +67,11 @@ namespace QueueIT.QueueToken.Tests
                 .Generate();
             String actualKey = instance.Key;
             Double? actualRank = instance.Rank;
-            String actualCustomData = instance.GetCustomDataValue("key");
             Assert.Null(actualKey);
             Assert.Equal(expectedRank, actualRank);
-            Assert.Null(actualCustomData);
+            Assert.False(instance.CustomData.ContainsKey("key"));
         }
+
         [Fact]
         public void factory_rank_customdata()
         {
@@ -84,7 +84,7 @@ namespace QueueIT.QueueToken.Tests
                 .Generate();
             String actualKey = instance.Key;
             Double? actualRank = instance.Rank;
-            String actualCustomData = instance.GetCustomDataValue("key");
+            String actualCustomData = instance.CustomData["key"];
             Assert.Null(actualKey);
             Assert.Equal(expectedRank, actualRank);
             Assert.Equal(expectedCustomDataValue, actualCustomData);
@@ -100,7 +100,7 @@ namespace QueueIT.QueueToken.Tests
                 .Generate();
             String actualKey = instance.Key;
             Double? actualRank = instance.Rank;
-            String actualCustomData = instance.GetCustomDataValue("key");
+            String actualCustomData = instance.CustomData["key"];
             Assert.Null(actualKey);
             Assert.Null(actualRank);
             Assert.Equal(expectedCustomDataValue, actualCustomData);
