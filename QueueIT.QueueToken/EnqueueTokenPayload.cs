@@ -46,9 +46,12 @@ namespace QueueIT.QueueToken
             this._customData = customData;
         }
 
-        public Dictionary<string, string> GetCustomDataDictionary()
+        public IReadOnlyDictionary<string,string> CustomData
         {
-            return this._customData.ToDictionary(arg => arg.Key, arg2 => arg2.Value);
+            get
+            {
+                return this._customData.ToDictionary(arg => arg.Key, arg2 => arg2.Value);
+            }
         }
 
         public byte[] Serialize()

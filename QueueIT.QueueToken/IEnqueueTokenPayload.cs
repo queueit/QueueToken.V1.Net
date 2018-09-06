@@ -7,7 +7,7 @@ namespace QueueIT.QueueToken
     {
         string Key { get; }
         double? Rank { get; }
-        Dictionary<string, string> GetCustomDataDictionary();
+        IReadOnlyDictionary<string, string> CustomData { get; }
         byte[] Serialize();
     }
 }
