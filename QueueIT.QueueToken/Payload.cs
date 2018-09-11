@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Runtime.Serialization.Json;
 using QueueIT.QueueToken.Model;
 
@@ -51,7 +52,7 @@ namespace QueueIT.QueueToken
     {
         string Key { get; }
         double? Rank { get; }
-        string GetCustomDataValue(String key);
+        IReadOnlyDictionary<string, string> CustomData { get; }
         string EncryptAndEncode(string secretKey, string tokenIdentifier);
     }
 
@@ -95,11 +96,12 @@ namespace QueueIT.QueueToken
             this._customData = customData;
         }
 
-        public string GetCustomDataValue(string key)
+        public IReadOnlyDictionary<string, string> CustomData
         {
-            if (!_customData.ContainsKey(key))
-                return null;
-            return this._customData[key];
+            get
+            {
+                return this._customData.ToDictionary(arg => arg.Key, arg2 => arg2.Value);
+            }
         }
 
         internal byte[] Serialize()
