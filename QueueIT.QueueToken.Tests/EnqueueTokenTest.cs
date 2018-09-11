@@ -130,7 +130,7 @@ namespace QueueIT.QueueToken.Tests
                 payload);
             token.Generate("5ebbf794-1665-4d48-80d6-21ac34be7faedf9e10b3-551a-4682-bb77-fee59d6355d6", false);
 
-            string actualSignedToken = token.SignedToken;
+            string actualSignedToken = token.Token;
 
             Assert.Equal(expectedSignedToken, actualSignedToken);
         }
@@ -150,7 +150,7 @@ namespace QueueIT.QueueToken.Tests
                 null);
             token.Generate("5ebbf794-1665-4d48-80d6-21ac34be7faedf9e10b3-551a-4682-bb77-fee59d6355d6", false);
 
-            string actualSignedToken = token.SignedToken;
+            string actualSignedToken = token.Token;
 
             Assert.Equal(expectedSignedToken, actualSignedToken);
         }
@@ -170,7 +170,7 @@ namespace QueueIT.QueueToken.Tests
                 null);
             token.Generate("5ebbf794-1665-4d48-80d6-21ac34be7faedf9e10b3-551a-4682-bb77-fee59d6355d6", false);
 
-            string actualSignedToken = token.SignedToken;
+            string actualSignedToken = token.Token;
 
             Assert.Equal(expectedSignedToken, actualSignedToken);
         }
@@ -178,10 +178,10 @@ namespace QueueIT.QueueToken.Tests
         [Fact]
         public void Parse_WithoutPayload()
         {
-            string signature = "nN4Q5wIYKktChsK1_UEuP_tjiZj9xYOd65iYv4E9hbY";
+            string hash = "nN4Q5wIYKktChsK1_UEuP_tjiZj9xYOd65iYv4E9hbY";
             string token =
                 "eyJ0eXAiOiJRVDEiLCJlbmMiOiJBRVMyNTYiLCJpc3MiOjE1MzQ3MjMyMDAwMDAsImV4cCI6MTUzOTEyOTYwMDAwMCwidGkiOiJhMjFkNDIzYS00M2ZkLTQ4MjEtODRmYS00MzkwZjZhMmZkM2UiLCJjIjoidGlja2V0YW5pYSIsImUiOiJteWV2ZW50In0.";
-            string tokenString = token + "." + signature;
+            string tokenString = token + "." + hash;
 
             var enqueueToken = EnqueueToken.Parse(tokenString, "5ebbf794-1665-4d48-80d6-21ac34be7faedf9e10b3-551a-4682-bb77-fee59d6355d6");
 
@@ -190,9 +190,9 @@ namespace QueueIT.QueueToken.Tests
             Assert.Equal("myevent", enqueueToken.EventId);
             Assert.Equal(new DateTime(2018, 10, 10, 0, 0, 0, DateTimeKind.Utc), enqueueToken.Expires);
             Assert.Equal(new DateTime(2018, 08, 20, 0, 0, 0, DateTimeKind.Utc), enqueueToken.Issued);
-            Assert.Equal(signature, enqueueToken.Signature);
-            Assert.Equal(token, enqueueToken.Token);
-            Assert.Equal(tokenString, enqueueToken.SignedToken);
+            Assert.Equal(hash, enqueueToken.HashCode);
+            Assert.Equal(token, enqueueToken.TokenWithoutHash);
+            Assert.Equal(tokenString, enqueueToken.Token);
             Assert.Equal(EncryptionType.AES256, enqueueToken.Encryption);
             Assert.Equal(TokenVersion.QT1, enqueueToken.TokenVersion);
             Assert.Null(enqueueToken.Payload);
@@ -201,10 +201,10 @@ namespace QueueIT.QueueToken.Tests
         [Fact]
         public void Parse_WithPayload()
         {
-            string signature = "aZgzkJm57etFaXjjME_-9LjOgPNTTqkp1aJ057HuEiU";
+            string hash = "aZgzkJm57etFaXjjME_-9LjOgPNTTqkp1aJ057HuEiU";
             string token =
                 "eyJ0eXAiOiJRVDEiLCJlbmMiOiJBRVMyNTYiLCJpc3MiOjE1MzQ3MjMyMDAwMDAsImV4cCI6MTUzOTEyOTYwMDAwMCwidGkiOiJhMjFkNDIzYS00M2ZkLTQ4MjEtODRmYS00MzkwZjZhMmZkM2UiLCJjIjoidGlja2V0YW5pYSIsImUiOiJteWV2ZW50In0.0rDlI69F1Dx4Twps5qD4cQrbXbCRiezBd6fH1PVm6CnVY456FALkAhN3rgVrh_PGCJHcEXN5zoqFg65MH8WZc_CQdD63hJre3Sedu0-9zIs";
-            string tokenString = token + "." + signature;
+            string tokenString = token + "." + hash;
 
             var enqueueToken = EnqueueToken.Parse(tokenString, "5ebbf794-1665-4d48-80d6-21ac34be7faedf9e10b3-551a-4682-bb77-fee59d6355d6");
 
@@ -213,9 +213,9 @@ namespace QueueIT.QueueToken.Tests
             Assert.Equal("myevent", enqueueToken.EventId);
             Assert.Equal(new DateTime(2018, 10, 10, 0, 0, 0, DateTimeKind.Utc), enqueueToken.Expires);
             Assert.Equal(new DateTime(2018, 08, 20, 0, 0, 0, DateTimeKind.Utc), enqueueToken.Issued);
-            Assert.Equal(signature, enqueueToken.Signature);
-            Assert.Equal(token, enqueueToken.Token);
-            Assert.Equal(tokenString, enqueueToken.SignedToken);
+            Assert.Equal(hash, enqueueToken.HashCode);
+            Assert.Equal(token, enqueueToken.TokenWithoutHash);
+            Assert.Equal(tokenString, enqueueToken.Token);
             Assert.Equal(EncryptionType.AES256, enqueueToken.Encryption);
             Assert.Equal(TokenVersion.QT1, enqueueToken.TokenVersion);
             Assert.Equal("somekey", enqueueToken.Payload.Key);
@@ -227,10 +227,10 @@ namespace QueueIT.QueueToken.Tests
         [Fact]
         public void Parse_MinimalHeader()
         {
-            string signature = "ChCRF4bTbt4zlOcvXLjQYouhgqgiNNNZqcci8VWoZIU";
+            string hash = "ChCRF4bTbt4zlOcvXLjQYouhgqgiNNNZqcci8VWoZIU";
             string token =
                 "eyJ0eXAiOiJRVDEiLCJlbmMiOiJBRVMyNTYiLCJpc3MiOjE1MzQ3MjMyMDAwMDAsInRpIjoiYTIxZDQyM2EtNDNmZC00ODIxLTg0ZmEtNDM5MGY2YTJmZDNlIiwiYyI6InRpY2tldGFuaWEifQ.";
-            string tokenString = token + "." + signature;
+            string tokenString = token + "." + hash;
 
             var enqueueToken = EnqueueToken.Parse(tokenString, "5ebbf794-1665-4d48-80d6-21ac34be7faedf9e10b3-551a-4682-bb77-fee59d6355d6");
 
@@ -239,9 +239,9 @@ namespace QueueIT.QueueToken.Tests
             Assert.Null(enqueueToken.EventId);
             Assert.Equal(DateTime.MaxValue, enqueueToken.Expires);
             Assert.Equal(new DateTime(2018, 08, 20, 0, 0, 0, DateTimeKind.Utc), enqueueToken.Issued);
-            Assert.Equal(signature, enqueueToken.Signature);
-            Assert.Equal(token, enqueueToken.Token);
-            Assert.Equal(tokenString, enqueueToken.SignedToken);
+            Assert.Equal(hash, enqueueToken.HashCode);
+            Assert.Equal(token, enqueueToken.TokenWithoutHash);
+            Assert.Equal(tokenString, enqueueToken.Token);
             Assert.Equal(EncryptionType.AES256, enqueueToken.Encryption);
             Assert.Equal(TokenVersion.QT1, enqueueToken.TokenVersion);
             Assert.Null(enqueueToken.Payload);

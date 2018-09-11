@@ -1,5 +1,7 @@
 ﻿using System;
+using System.IO;
 using System.Runtime.Serialization;
+using System.Runtime.Serialization.Json;
 
 namespace QueueIT.QueueToken.Model
 {
@@ -20,5 +22,30 @@ namespace QueueIT.QueueToken.Model
         public string CustomerId { get; set; }
         [DataMember(Name = "e", Order = 7, EmitDefaultValue = false)]
         public string EventId { get; set; }
+
+        internal static HeaderDto DeserializeHeader(string input)
+        {
+            var jsonSerializer = new DataContractJsonSerializer(typeof(HeaderDto));
+
+            var headerJson = Base64UrlEncoding.Decode(input);
+
+            using (var stream = new MemoryStream(headerJson))
+            {
+                return jsonSerializer.ReadObject(stream) as HeaderDto;
+            }
+        }
+
+        internal string Serialize()
+        {
+            var jsonSerializer = new DataContractJsonSerializer(typeof(HeaderDto));
+
+            using (var stream = new MemoryStream())
+            {
+                jsonSerializer.WriteObject(stream, this);
+
+                return Base64UrlEncoding.Encode(stream.ToArray());
+            }
+        }
+
     }
 }
