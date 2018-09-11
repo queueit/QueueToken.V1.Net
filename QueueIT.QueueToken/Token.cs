@@ -11,6 +11,10 @@ namespace QueueIT.QueueToken
         {
             return new EnqueueTokenGenerator(customerId);
         }
+        public static IEnqueueToken Parse(string token, string secretKey)
+        {
+            return EnqueueToken.Parse(token, secretKey);
+        }
     }
 
     public class EnqueueTokenGenerator
