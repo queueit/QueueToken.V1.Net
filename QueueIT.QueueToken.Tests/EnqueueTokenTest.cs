@@ -225,6 +225,17 @@ namespace QueueIT.QueueToken.Tests
         }
 
         [Fact]
+        public void Parse_WithPayload_NoCustomData()
+        {
+            string tokenString = "eyJ0eXAiOiJRVDEiLCJlbmMiOiJBRVMyNTYiLCJpc3MiOjE1MzQ3MjMyMDAwMDAsImV4cCI6MTUzOTEyOTYwMDAwMCwidGkiOiJhMjFkNDIzYS00M2ZkLTQ4MjEtODRmYS00MzkwZjZhMmZkM2UiLCJjIjoidGlja2V0YW5pYSIsImUiOiJteWV2ZW50In0.0rDlI69F1Dx4Twps5qD4cQrbXbCRiezBd6fH1PVm6CloFzIj6sbdeItH-K5iOaF5.ZIg2jffmxRhCb1lv--w2DrOPofnsOvTXKt5dEGfrk7k";
+
+            var enqueueToken = Token.Parse(tokenString, "5ebbf794-1665-4d48-80d6-21ac34be7faedf9e10b3-551a-4682-bb77-fee59d6355d6");
+
+            Assert.NotNull(enqueueToken.Payload.CustomData);
+            Assert.Equal(0, enqueueToken.Payload.CustomData.Count);
+        }
+
+        [Fact]
         public void Parse_MinimalHeader()
         {
             string hash = "ChCRF4bTbt4zlOcvXLjQYouhgqgiNNNZqcci8VWoZIU";

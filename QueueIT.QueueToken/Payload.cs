@@ -93,7 +93,7 @@ namespace QueueIT.QueueToken
         {
             this.Key = key;
             this.Rank = rank;
-            this._customData = customData;
+            this._customData = customData ?? new Dictionary<string, string>();
         }
 
         public IReadOnlyDictionary<string, string> CustomData
