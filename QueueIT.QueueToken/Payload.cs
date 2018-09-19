@@ -60,7 +60,7 @@ namespace QueueIT.QueueToken
     {
         public string Key { get; }
         public double? Rank { get; }
-        private Dictionary<string, string> _customData;
+        private readonly Dictionary<string, string> _customData;
 
         public EnqueueTokenPayload()
         {

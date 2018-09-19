@@ -15,8 +15,12 @@ namespace QueueIT.QueueToken.Tests
                     .WithKey(expectedKey)
                     .Generate();
             String actualKey = instance.Key;
+            var actualCustomData = instance.CustomData;
             Assert.Equal(expectedKey, actualKey);
             Assert.Null(instance.Rank);
+            Assert.NotNull(actualCustomData);
+            Assert.Equal(0, actualCustomData.Count);
+
             Assert.False(instance.CustomData.ContainsKey("key"));
         }
 
@@ -32,8 +36,11 @@ namespace QueueIT.QueueToken.Tests
                 .Generate();
             String actualKey = instance.Key;
             Double? actualRank = instance.Rank;
+            var actualCustomData = instance.CustomData;
             Assert.Equal(expectedKey, actualKey);
             Assert.Equal(expectedRank, actualRank);
+            Assert.NotNull(actualCustomData);
+            Assert.Equal(0, actualCustomData.Count);
             Assert.False(instance.CustomData.ContainsKey("key"));
         }
 
@@ -67,9 +74,11 @@ namespace QueueIT.QueueToken.Tests
                 .Generate();
             String actualKey = instance.Key;
             Double? actualRank = instance.Rank;
+            var actualCustomData = instance.CustomData;
             Assert.Null(actualKey);
             Assert.Equal(expectedRank, actualRank);
-            Assert.False(instance.CustomData.ContainsKey("key"));
+            Assert.NotNull(actualCustomData);
+            Assert.Equal(0, actualCustomData.Count);
         }
 
         [Fact]
