@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Runtime.Serialization.Json;
 using QueueIT.QueueToken.Model;
 
 namespace QueueIT.QueueToken
@@ -28,9 +26,9 @@ namespace QueueIT.QueueToken
             return this;
         }
 
-        public EnqueueTokenPayloadGenerator WithRank(double rank)
+        public EnqueueTokenPayloadGenerator WithRelativeQuality(double relativeQuality)
         {
-            this._payload = new EnqueueTokenPayload(this._payload, rank);
+            this._payload = new EnqueueTokenPayload(this._payload, relativeQuality);
 
             return this;
         }
@@ -51,7 +49,7 @@ namespace QueueIT.QueueToken
     public interface IEnqueueTokenPayload
     {
         string Key { get; }
-        double? Rank { get; }
+        double? RelativeQuality { get; }
         IReadOnlyDictionary<string, string> CustomData { get; }
         string EncryptAndEncode(string secretKey, string tokenIdentifier);
     }
@@ -59,7 +57,7 @@ namespace QueueIT.QueueToken
     internal class EnqueueTokenPayload : IEnqueueTokenPayload
     {
         public string Key { get; }
-        public double? Rank { get; }
+        public double? RelativeQuality { get; }
         private readonly Dictionary<string, string> _customData;
 
         public EnqueueTokenPayload()
@@ -70,29 +68,29 @@ namespace QueueIT.QueueToken
         public EnqueueTokenPayload(EnqueueTokenPayload payload, string key)
         {
             this.Key = key;
-            this.Rank = payload.Rank;
+            this.RelativeQuality = payload.RelativeQuality;
             this._customData = payload._customData;
         }
 
-        public EnqueueTokenPayload(EnqueueTokenPayload payload, double rank)
+        public EnqueueTokenPayload(EnqueueTokenPayload payload, double relativeQuality)
         {
             this.Key = payload.Key;
-            this.Rank = rank;
+            this.RelativeQuality = relativeQuality;
             this._customData = payload._customData;
         }
 
         public EnqueueTokenPayload(EnqueueTokenPayload payload, string customDataKey, string customDataValue)
         {
             this.Key = payload.Key;
-            this.Rank = payload.Rank;
+            this.RelativeQuality = payload.RelativeQuality;
             this._customData = payload._customData;
             this._customData.Add(customDataKey, customDataValue);
         }
 
-        public EnqueueTokenPayload(string key, double? rank, Dictionary<string, string> customData)
+        public EnqueueTokenPayload(string key, double? relativeQuality, Dictionary<string, string> customData)
         {
             this.Key = key;
-            this.Rank = rank;
+            this.RelativeQuality = relativeQuality;
             this._customData = customData ?? new Dictionary<string, string>();
         }
 
@@ -109,7 +107,7 @@ namespace QueueIT.QueueToken
             var dto = new PayloadDto()
             {
                 Key = Key,
-                Rank = Rank,
+                RelativeQuality = RelativeQuality,
                 CustomData = _customData.Count > 0 ? _customData : null
             };
 
@@ -119,7 +117,7 @@ namespace QueueIT.QueueToken
         public static EnqueueTokenPayload Deserialize(string input, string secretKey, string tokenIdentifier)
         {
             var dto = PayloadDto.DeserializePayload(input, secretKey, tokenIdentifier);
-            return new EnqueueTokenPayload(dto.Key, dto.Rank, dto.CustomData);
+            return new EnqueueTokenPayload(dto.Key, dto.RelativeQuality, dto.CustomData);
         }
 
         public string EncryptAndEncode(string secretKey, string tokenIdentifier)

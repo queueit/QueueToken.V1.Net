@@ -83,7 +83,7 @@ namespace QueueIT.QueueToken.Tests
         }
 
         [Fact]
-        public void Factory_WithPayload_WithKey_WithRank()
+        public void Factory_WithPayload_WithKey_WithRelativeQuality()
         {
             string expectedEventId = "myevent";
             string expectedCustomerId = "ticketania";
@@ -116,7 +116,7 @@ namespace QueueIT.QueueToken.Tests
             IEnqueueTokenPayload payload = Payload
                 .Enqueue()
                 .WithKey("somekey")
-                .WithRank(0.45678663514)
+                .WithRelativeQuality(0.45678663514)
                 .WithCustomData("color", "blue")
                 .WithCustomData("size", "medium")
                 .Generate();
@@ -219,7 +219,7 @@ namespace QueueIT.QueueToken.Tests
             Assert.Equal(EncryptionType.AES256, enqueueToken.Encryption);
             Assert.Equal(TokenVersion.QT1, enqueueToken.TokenVersion);
             Assert.Equal("somekey", enqueueToken.Payload.Key);
-            Assert.Equal(0.45678663514, enqueueToken.Payload.Rank);
+            Assert.Equal(0.45678663514, enqueueToken.Payload.RelativeQuality);
             Assert.Equal("blue", enqueueToken.Payload.CustomData["color"]);
             Assert.Equal("medium", enqueueToken.Payload.CustomData["size"]);
         }

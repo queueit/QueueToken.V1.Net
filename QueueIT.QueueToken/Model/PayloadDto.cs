@@ -9,7 +9,7 @@ namespace QueueIT.QueueToken.Model
     public class PayloadDto
     {
         [DataMember(Name = "r", Order = 1, EmitDefaultValue = false)]
-        public double? Rank { get; set; }
+        public double? RelativeQuality { get; set; }
         [DataMember(Name = "k", Order = 2, EmitDefaultValue = false)]
         public string Key { get; set; }
         [DataMember(Name = "cd", Order = 3, EmitDefaultValue = false)]

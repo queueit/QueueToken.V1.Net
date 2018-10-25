@@ -17,7 +17,7 @@ namespace QueueIT.QueueToken.Tests
             String actualKey = instance.Key;
             var actualCustomData = instance.CustomData;
             Assert.Equal(expectedKey, actualKey);
-            Assert.Null(instance.Rank);
+            Assert.Null(instance.RelativeQuality);
             Assert.NotNull(actualCustomData);
             Assert.Equal(0, actualCustomData.Count);
 
@@ -25,77 +25,77 @@ namespace QueueIT.QueueToken.Tests
         }
 
         [Fact]
-        public void factory_key_rank()
+        public void factory_key_relativequality()
         {
             String expectedKey = "myKey";
-            Double expectedRank = 0.456;
+            Double expectedRelativeQuality = 0.456;
             IEnqueueTokenPayload instance = Payload
                 .Enqueue()
                 .WithKey(expectedKey)
-                .WithRank(expectedRank)
+                .WithRelativeQuality(expectedRelativeQuality)
                 .Generate();
             String actualKey = instance.Key;
-            Double? actualRank = instance.Rank;
+            Double? actualRelativeQuality = instance.RelativeQuality;
             var actualCustomData = instance.CustomData;
             Assert.Equal(expectedKey, actualKey);
-            Assert.Equal(expectedRank, actualRank);
+            Assert.Equal(expectedRelativeQuality, actualRelativeQuality);
             Assert.NotNull(actualCustomData);
             Assert.Equal(0, actualCustomData.Count);
             Assert.False(instance.CustomData.ContainsKey("key"));
         }
 
         [Fact]
-        public void factory_key_rank_customdata()
+        public void factory_key_relativequality_customdata()
         {
             String expectedKey = "myKey";
-            Double expectedRank = 0.456;
+            Double expectedRelativeQuality = 0.456;
             String expectedCustomDataValue = "Value";
             IEnqueueTokenPayload instance = Payload
                 .Enqueue()
                 .WithKey(expectedKey)
-                .WithRank(expectedRank)
+                .WithRelativeQuality(expectedRelativeQuality)
                 .WithCustomData("key", expectedCustomDataValue)
                 .Generate();
             String actualKey = instance.Key;
-            Double? actualRank = instance.Rank;
+            Double? actualRelativeQuality = instance.RelativeQuality;
             String actualCustomData = instance.CustomData["key"];
             Assert.Equal(expectedKey, actualKey);
-            Assert.Equal(expectedRank, actualRank);
+            Assert.Equal(expectedRelativeQuality, actualRelativeQuality);
             Assert.Equal(expectedCustomDataValue, actualCustomData);
         }
 
         [Fact]
-        public void factory_rank()
+        public void factory_relativequality()
         {
-            Double expectedRank = 0.456;
+            Double expectedRelativeQuality = 0.456;
             IEnqueueTokenPayload instance = Payload
                 .Enqueue()
-                .WithRank(expectedRank)
+                .WithRelativeQuality(expectedRelativeQuality)
                 .Generate();
             String actualKey = instance.Key;
-            Double? actualRank = instance.Rank;
+            Double? actualRelativeQuality = instance.RelativeQuality;
             var actualCustomData = instance.CustomData;
             Assert.Null(actualKey);
-            Assert.Equal(expectedRank, actualRank);
+            Assert.Equal(expectedRelativeQuality, actualRelativeQuality);
             Assert.NotNull(actualCustomData);
             Assert.Equal(0, actualCustomData.Count);
         }
 
         [Fact]
-        public void factory_rank_customdata()
+        public void factory_relativequality_customdata()
         {
-            Double expectedRank = 0.456;
+            Double expectedRelativeQuality = 0.456;
             String expectedCustomDataValue = "Value";
             IEnqueueTokenPayload instance = Payload
                 .Enqueue()
-                .WithRank(expectedRank)
+                .WithRelativeQuality(expectedRelativeQuality)
                 .WithCustomData("key", expectedCustomDataValue)
                 .Generate();
             String actualKey = instance.Key;
-            Double? actualRank = instance.Rank;
+            Double? actualRelativeQuality = instance.RelativeQuality;
             String actualCustomData = instance.CustomData["key"];
             Assert.Null(actualKey);
-            Assert.Equal(expectedRank, actualRank);
+            Assert.Equal(expectedRelativeQuality, actualRelativeQuality);
             Assert.Equal(expectedCustomDataValue, actualCustomData);
         }
 
@@ -108,22 +108,22 @@ namespace QueueIT.QueueToken.Tests
                 .WithCustomData("key", expectedCustomDataValue)
                 .Generate();
             String actualKey = instance.Key;
-            Double? actualRank = instance.Rank;
+            Double? actualRelativeQuality = instance.RelativeQuality;
             String actualCustomData = instance.CustomData["key"];
             Assert.Null(actualKey);
-            Assert.Null(actualRank);
+            Assert.Null(actualRelativeQuality);
             Assert.Equal(expectedCustomDataValue, actualCustomData);
         }
 
         [Fact]
-        public void serialize_key_rank_multicustomdata()
+        public void serialize_key_relativequality_multicustomdata()
         {
             String expectedJson = "{\"r\":0.456,\"k\":\"myKey\",\"cd\":{\"key1\":\"Value1\",\"key2\":\"Value2\",\"key3\":\"Value3\"}}";
 
             IEnqueueTokenPayload instance = Payload
                 .Enqueue()
                 .WithKey("myKey")
-                .WithRank(0.456)
+                .WithRelativeQuality(0.456)
                 .WithCustomData("key1", "Value1")
                 .WithCustomData("key2", "Value2")
                 .WithCustomData("key3", "Value3")
@@ -134,14 +134,14 @@ namespace QueueIT.QueueToken.Tests
         }
 
         [Fact]
-        public void serialize_key_rank_onecustomdata()
+        public void serialize_key_relativequality_onecustomdata()
         {
             String expectedJson = "{\"r\":0.456,\"k\":\"myKey\",\"cd\":{\"key1\":\"Value1\"}}";
 
             IEnqueueTokenPayload instance = Payload
                 .Enqueue()
                 .WithKey("myKey")
-                .WithRank(0.456)
+                .WithRelativeQuality(0.456)
                 .WithCustomData("key1", "Value1")
                 .Generate();
             String actualJson = Encoding.UTF8.GetString(((EnqueueTokenPayload)instance).Serialize());
@@ -150,14 +150,14 @@ namespace QueueIT.QueueToken.Tests
         }
 
         [Fact]
-        public void serialize_key_rank()
+        public void serialize_key_relativequality()
         {
             String expectedJson = "{\"r\":0.456,\"k\":\"myKey\"}";
 
             IEnqueueTokenPayload instance = Payload
                 .Enqueue()
                 .WithKey("myKey")
-                .WithRank(0.456)
+                .WithRelativeQuality(0.456)
                 .Generate();
             String actualJson = Encoding.UTF8.GetString(((EnqueueTokenPayload)instance).Serialize());
 
@@ -193,13 +193,13 @@ namespace QueueIT.QueueToken.Tests
         }
 
         [Fact]
-        public void serialize_rank()
+        public void serialize_relativequality()
         {
             String expectedJson = "{\"r\":0.456}";
 
             IEnqueueTokenPayload instance = Payload
                 .Enqueue()
-                .WithRank(0.456)
+                .WithRelativeQuality(0.456)
                 .Generate();
             String actualJson = Encoding.UTF8.GetString(((EnqueueTokenPayload)instance).Serialize());
 
