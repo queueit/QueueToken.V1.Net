@@ -10,8 +10,6 @@ namespace QueueIT.QueueToken.Tests
         [Fact]
         public void Factory_simple()
         {
-
-
             DateTime startTime = DateTime.UtcNow;
             string expectedCustomerId = "ticketania";
             IEnqueueToken token = Token
@@ -29,6 +27,19 @@ namespace QueueIT.QueueToken.Tests
             Assert.Null(token.EventId);
             Assert.Null(token.Payload);
         }
+
+        [Fact]
+        public void Factory_TokenIdentifierPrefix()
+        {
+            string tokenIdentifierPrefix = "SomePrefix";
+            IEnqueueToken token = Token
+                .Enqueue("ticketania", tokenIdentifierPrefix)
+                .Generate("5ebbf794-1665-4d48-80d6-21ac34be7faedf9e10b3-551a-4682-bb77-fee59d6355d6");
+
+            var tokenIdentifierParts = token.TokenIdentifier.Split("~");
+            Assert.Equal(tokenIdentifierPrefix, tokenIdentifierParts[0]);
+        }
+
 
         [Fact]
         public void Factory_WithValidity_long()

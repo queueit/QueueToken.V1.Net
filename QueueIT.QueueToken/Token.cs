@@ -7,9 +7,9 @@ namespace QueueIT.QueueToken
 {
     public class Token
     {
-        public static EnqueueTokenGenerator Enqueue(String customerId) 
+        public static EnqueueTokenGenerator Enqueue(String customerId, string tokenIdentifierPrefix = null) 
         {
-            return new EnqueueTokenGenerator(customerId);
+            return new EnqueueTokenGenerator(customerId, tokenIdentifierPrefix);
         }
 
         public static IEnqueueToken Parse(string token, string secretKey)
@@ -22,9 +22,9 @@ namespace QueueIT.QueueToken
     {
         private EnqueueToken _token;
 
-        public EnqueueTokenGenerator(String customerId)
+        public EnqueueTokenGenerator(string customerId, string tokenIdentifierPrefix = null)
         {
-            this._token = new EnqueueToken(customerId);
+            this._token = new EnqueueToken(customerId, tokenIdentifierPrefix);
         }
 
         public EnqueueTokenGenerator WithEventId(String eventId)
@@ -79,6 +79,7 @@ namespace QueueIT.QueueToken
 
     internal class EnqueueToken : IEnqueueToken
     {
+        private readonly string _tokenIdentifierPrefix;
         public string CustomerId { get; }
         public string EventId { get; }
         public DateTime Issued { get; }
@@ -91,16 +92,24 @@ namespace QueueIT.QueueToken
         public string HashCode { get; private set; }
         public string Token => TokenWithoutHash + "." + HashCode;
 
-        internal EnqueueToken(string customerId)
+        internal EnqueueToken(string customerId, string tokenIdentifierPrefix)
         {
+            _tokenIdentifierPrefix = tokenIdentifierPrefix;
             CustomerId = customerId;
             Issued = DateTime.UtcNow;
             Expires = DateTime.MaxValue;
-            TokenIdentifier = Guid.NewGuid().ToString();
+            TokenIdentifier = GetTokenIdentifier(tokenIdentifierPrefix);
+        }
+
+        private static string GetTokenIdentifier(string tokenIdentifierPrefix)
+        {
+            return string.IsNullOrEmpty(tokenIdentifierPrefix) 
+                ? Guid.NewGuid().ToString()
+                : $"{tokenIdentifierPrefix}~{Guid.NewGuid()}";
         }
 
         internal EnqueueToken(EnqueueToken token, DateTime expires)
-            : this(token.CustomerId)
+            : this(token.CustomerId, token._tokenIdentifierPrefix)
         {
             Issued = token.Issued;
             EventId = token.EventId;
@@ -109,7 +118,7 @@ namespace QueueIT.QueueToken
         }
 
         internal EnqueueToken(EnqueueToken token, string eventId)
-            : this(token.CustomerId)
+            : this(token.CustomerId, token._tokenIdentifierPrefix)
         {
             Issued = token.Issued;
             EventId = eventId;
@@ -118,7 +127,7 @@ namespace QueueIT.QueueToken
         }
 
         internal EnqueueToken(EnqueueToken token, IEnqueueTokenPayload payload)
-            : this(token.CustomerId)
+            : this(token.CustomerId, token._tokenIdentifierPrefix)
         {
             Issued = token.Issued;
             EventId = token.EventId;
@@ -139,7 +148,7 @@ namespace QueueIT.QueueToken
         internal void Generate(string secretKey, bool resetTokenIdentifier = true)
         {
             if (resetTokenIdentifier)
-                TokenIdentifier = Guid.NewGuid().ToString();
+                TokenIdentifier = GetTokenIdentifier(_tokenIdentifierPrefix);
 
             try
             {
