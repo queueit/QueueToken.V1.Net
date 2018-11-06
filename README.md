@@ -53,6 +53,18 @@ var token = Token
 string token = token.Token;
 ```
 
+### Specifying token identifier prefix
+A prefix for the token identifier can optionally be provided to restrict the user session after getting through the queue to the one used before entering the queue. Once the user is through the queue the token identifier is provided to the target application in the Known User token. The format of the token identifier is then "[YOUR PREFIX]~[GUID]", e.g: AnfTDnpwazllYmnmgaCJ8tErV80YHv77ni5NgqQNhfWwxNqrNcHb.~e937ef0d-48ec-4ff7-866e-52033273cb3d.
+```
+var tokenIdentifierPrefix = "AnfTDnpwazllYmnmgaCJ8tErV80YHv77ni5NgqQNhfWwxNqrNcHb";
+var token = Token
+  .Enqueue("ticketania", tokenIdentifierPrefix)
+  .Generate(secretKey);
+
+var tokenIdentifier = token.TokenIdentifier();
+// tokenIdentifier example: AnfTDnpwazllYmnmgaCJ8tErV80YHv77ni5NgqQNhfWwxNqrNcHb.~e937ef0d-48ec-4ff7-866e-52033273cb3d
+```
+
 ## Serialized Token
 > eyJ0eXAiOiJRVDEiLCJlbmMiOiJBRVMyNTYiLCJpc3MiOjE1MzQ3MjMyMDAwMDAsImV4cCI6MTUzOTEyOTYwMDAwMCwidGkiOiJhMjFkNDIzYS00M2ZkLTQ4MjEtODRmYS00MzkwZjZhMmZkM2UiLCJjIjoidGlja2V0YW5pYSIsImUiOiJteWV2ZW50In0.0rDlI69F1Dx4Twps5qD4cQrbXbCRiezBd6fH1PVm6CnVY456FALkAhN3rgVrh_PGCJHcEXN5zoqFg65MH8WZc_CQdD63hJre3Sedu0-9zIs.aZgzkJm57etFaXjjME_-9LjOgPNTTqkp1aJ057HuEiU
 
