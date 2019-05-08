@@ -40,7 +40,6 @@ namespace QueueIT.QueueToken.Tests
             Assert.Equal(tokenIdentifierPrefix, tokenIdentifierParts[0]);
         }
 
-
         [Fact]
         public void Factory_WithValidity_long()
         {
@@ -78,6 +77,19 @@ namespace QueueIT.QueueToken.Tests
                 .Generate("5ebbf794-1665-4d48-80d6-21ac34be7faedf9e10b3-551a-4682-bb77-fee59d6355d6");
 
             Assert.Equal(expectedEventId, token.EventId);
+        }
+
+        [Fact]
+        public void Factory_WithIPAddress()
+        {
+            string expectedIpAddress = "1.5.8.9";
+
+            IEnqueueToken token = Token
+                .Enqueue("ticketania")
+                .WithIpAddress(expectedIpAddress)
+                .Generate("5ebbf794-1665-4d48-80d6-21ac34be7faedf9e10b3-551a-4682-bb77-fee59d6355d6");
+
+            Assert.Equal(expectedIpAddress, token.IpAddress);
         }
 
         [Fact]
@@ -138,6 +150,7 @@ namespace QueueIT.QueueToken.Tests
                 "myevent",
                 new DateTime(2018, 08, 20, 0, 0, 0, DateTimeKind.Utc),
                 new DateTime(2018, 10, 10, 0, 0, 0, DateTimeKind.Utc),
+                null,
                 payload);
             token.Generate("5ebbf794-1665-4d48-80d6-21ac34be7faedf9e10b3-551a-4682-bb77-fee59d6355d6", false);
 
@@ -150,7 +163,7 @@ namespace QueueIT.QueueToken.Tests
         public void GenerateToken_WithoutPayload()
         {
             string expectedSignedToken =
-                "eyJ0eXAiOiJRVDEiLCJlbmMiOiJBRVMyNTYiLCJpc3MiOjE1MzQ3MjMyMDAwMDAsImV4cCI6MTUzOTEyOTYwMDAwMCwidGkiOiJhMjFkNDIzYS00M2ZkLTQ4MjEtODRmYS00MzkwZjZhMmZkM2UiLCJjIjoidGlja2V0YW5pYSIsImUiOiJteWV2ZW50In0..nN4Q5wIYKktChsK1_UEuP_tjiZj9xYOd65iYv4E9hbY";
+                "eyJ0eXAiOiJRVDEiLCJlbmMiOiJBRVMyNTYiLCJpc3MiOjE1MzQ3MjMyMDAwMDAsImV4cCI6MTUzOTEyOTYwMDAwMCwidGkiOiJhMjFkNDIzYS00M2ZkLTQ4MjEtODRmYS00MzkwZjZhMmZkM2UiLCJjIjoidGlja2V0YW5pYSIsImUiOiJteWV2ZW50IiwiaXAiOiI1LjcuOC42In0..rqQznIDybri70GrsJ-hd_Hzp98HUqcsBGnWaiyqjlvY";
 
             EnqueueToken token = new EnqueueToken(
                 "a21d423a-43fd-4821-84fa-4390f6a2fd3e",
@@ -158,6 +171,7 @@ namespace QueueIT.QueueToken.Tests
                 "myevent",
                 new DateTime(2018, 08, 20, 0, 0, 0, DateTimeKind.Utc),
                 new DateTime(2018, 10, 10, 0, 0, 0, DateTimeKind.Utc),
+                "5.7.8.6",
                 null);
             token.Generate("5ebbf794-1665-4d48-80d6-21ac34be7faedf9e10b3-551a-4682-bb77-fee59d6355d6", false);
 
@@ -178,6 +192,7 @@ namespace QueueIT.QueueToken.Tests
                 null,
                 new DateTime(2018, 08, 20, 0, 0, 0, DateTimeKind.Utc),
                 null,
+                null,
                 null);
             token.Generate("5ebbf794-1665-4d48-80d6-21ac34be7faedf9e10b3-551a-4682-bb77-fee59d6355d6", false);
 
@@ -189,9 +204,9 @@ namespace QueueIT.QueueToken.Tests
         [Fact]
         public void Parse_WithoutPayload()
         {
-            string hash = "nN4Q5wIYKktChsK1_UEuP_tjiZj9xYOd65iYv4E9hbY";
+            string hash = "rqQznIDybri70GrsJ-hd_Hzp98HUqcsBGnWaiyqjlvY";
             string token =
-                "eyJ0eXAiOiJRVDEiLCJlbmMiOiJBRVMyNTYiLCJpc3MiOjE1MzQ3MjMyMDAwMDAsImV4cCI6MTUzOTEyOTYwMDAwMCwidGkiOiJhMjFkNDIzYS00M2ZkLTQ4MjEtODRmYS00MzkwZjZhMmZkM2UiLCJjIjoidGlja2V0YW5pYSIsImUiOiJteWV2ZW50In0.";
+                "eyJ0eXAiOiJRVDEiLCJlbmMiOiJBRVMyNTYiLCJpc3MiOjE1MzQ3MjMyMDAwMDAsImV4cCI6MTUzOTEyOTYwMDAwMCwidGkiOiJhMjFkNDIzYS00M2ZkLTQ4MjEtODRmYS00MzkwZjZhMmZkM2UiLCJjIjoidGlja2V0YW5pYSIsImUiOiJteWV2ZW50IiwiaXAiOiI1LjcuOC42In0.";
             string tokenString = token + "." + hash;
 
             var enqueueToken = Token.Parse(tokenString, "5ebbf794-1665-4d48-80d6-21ac34be7faedf9e10b3-551a-4682-bb77-fee59d6355d6");
@@ -199,6 +214,7 @@ namespace QueueIT.QueueToken.Tests
             Assert.Equal("a21d423a-43fd-4821-84fa-4390f6a2fd3e", enqueueToken.TokenIdentifier);
             Assert.Equal("ticketania", enqueueToken.CustomerId);
             Assert.Equal("myevent", enqueueToken.EventId);
+            Assert.Equal("5.7.8.6", enqueueToken.IpAddress);
             Assert.Equal(new DateTime(2018, 10, 10, 0, 0, 0, DateTimeKind.Utc), enqueueToken.Expires);
             Assert.Equal(new DateTime(2018, 08, 20, 0, 0, 0, DateTimeKind.Utc), enqueueToken.Issued);
             Assert.Equal(hash, enqueueToken.HashCode);
@@ -268,6 +284,5 @@ namespace QueueIT.QueueToken.Tests
             Assert.Equal(TokenVersion.QT1, enqueueToken.TokenVersion);
             Assert.Null(enqueueToken.Payload);
         }
-
     }
 }

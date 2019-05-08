@@ -22,6 +22,8 @@ namespace QueueIT.QueueToken.Model
         public string CustomerId { get; set; }
         [DataMember(Name = "e", Order = 7, EmitDefaultValue = false)]
         public string EventId { get; set; }
+        [DataMember(Name = "ip", Order = 8, EmitDefaultValue = false)]
+        public string IpAddress { get; set; }
 
         internal static HeaderDto DeserializeHeader(string input)
         {
