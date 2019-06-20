@@ -61,9 +61,9 @@ namespace QueueIT.QueueToken
             return _token;
         }
 
-        public EnqueueTokenGenerator WithIpAddress(string ipAddress)
+        public EnqueueTokenGenerator WithIpAddress(string ipAddress, string xForwardedFor)
         {
-            this._token = EnqueueToken.AddIPAddress(this._token, ipAddress);
+            this._token = EnqueueToken.AddIPAddress(this._token, ipAddress, xForwardedFor);
 
             return this;
         }
@@ -79,6 +79,7 @@ namespace QueueIT.QueueToken
         string CustomerId { get; }
         string EventId { get; }
         string IpAddress { get; }
+        string XForwardedFor { get; }
         IEnqueueTokenPayload Payload { get; }
         string TokenWithoutHash { get; }
         string Token { get; }
@@ -91,6 +92,7 @@ namespace QueueIT.QueueToken
         public string CustomerId { get; }
         public string EventId { get; }
         public string IpAddress { get; }
+        public string XForwardedFor { get; }
         public DateTime Issued { get; }
         public string TokenIdentifier { get; private set; }
         public TokenVersion TokenVersion => TokenVersion.QT1;
@@ -117,7 +119,7 @@ namespace QueueIT.QueueToken
                 : $"{tokenIdentifierPrefix}~{Guid.NewGuid()}";
         }
 
-        internal EnqueueToken(string tokenIdentifier, string customerId, string eventId, DateTime issued, DateTime? expires, string ipAddress, IEnqueueTokenPayload payload)
+        internal EnqueueToken(string tokenIdentifier, string customerId, string eventId, DateTime issued, DateTime? expires, string ipAddress, string xForwardedFor, IEnqueueTokenPayload payload)
         {
             TokenIdentifier = tokenIdentifier;
             CustomerId = customerId;
@@ -126,6 +128,7 @@ namespace QueueIT.QueueToken
             Expires = expires ?? DateTime.MaxValue;
             Payload = payload;
             IpAddress = ipAddress;
+            XForwardedFor = xForwardedFor;
         }
 
         internal void Generate(string secretKey, bool resetTokenIdentifier = true)
@@ -144,7 +147,8 @@ namespace QueueIT.QueueToken
                     Expires = Expires == DateTime.MaxValue ? null : (long?)(new DateTimeOffset(Expires)).ToUnixTimeMilliseconds(),
                     Encryption = EncryptionType.AES256.ToString(),
                     TokenVersion = TokenVersion.QT1.ToString(),
-                    IpAddress = IpAddress
+                    IpAddress = IpAddress,
+                    XForwardedFor = XForwardedFor
                 };
 
                 string serialized = dto.Serialize() + ".";
@@ -206,6 +210,7 @@ namespace QueueIT.QueueToken
                         ? new DateTime?(DateTimeOffset.FromUnixTimeMilliseconds(headerModel.Expires.Value).DateTime)
                         : null,
                     headerModel.IpAddress,
+                    headerModel.XForwardedFor,
                     payload)
                 {
                     TokenWithoutHash = token,
@@ -218,21 +223,21 @@ namespace QueueIT.QueueToken
             }
         }
 
-        internal static EnqueueToken AddIPAddress(EnqueueToken token, string ipAddress)
+        internal static EnqueueToken AddIPAddress(EnqueueToken token, string ipAddress, string xForwardedFor)
         {
-            return new EnqueueToken(token.TokenIdentifier, token.CustomerId, token.EventId, token.Issued, token.Expires, ipAddress, token.Payload);
+            return new EnqueueToken(token.TokenIdentifier, token.CustomerId, token.EventId, token.Issued, token.Expires, ipAddress, xForwardedFor, token.Payload);
         }
         internal static EnqueueToken AddEventId(EnqueueToken token, string eventId)
         {
-            return new EnqueueToken(token.TokenIdentifier, token.CustomerId, eventId, token.Issued, token.Expires, token.IpAddress, token.Payload);
+            return new EnqueueToken(token.TokenIdentifier, token.CustomerId, eventId, token.Issued, token.Expires, token.IpAddress, token.XForwardedFor, token.Payload);
         }
         internal static EnqueueToken AddExpires(EnqueueToken token, DateTime expires)
         {
-            return new EnqueueToken(token.TokenIdentifier, token.CustomerId, token.EventId, token.Issued, expires, token.IpAddress, token.Payload);
+            return new EnqueueToken(token.TokenIdentifier, token.CustomerId, token.EventId, token.Issued, expires, token.IpAddress, token.XForwardedFor, token.Payload);
         }
         internal static EnqueueToken AddPayload(EnqueueToken token, IEnqueueTokenPayload payload)
         {
-            return new EnqueueToken(token.TokenIdentifier, token.CustomerId, token.EventId, token.Issued, token.Expires, token.IpAddress, payload);
+            return new EnqueueToken(token.TokenIdentifier, token.CustomerId, token.EventId, token.Issued, token.Expires, token.IpAddress, token.XForwardedFor, payload);
         }
     }
 
