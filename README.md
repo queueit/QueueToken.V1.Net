@@ -51,7 +51,7 @@ var token = Token
 		.WithCustomData("size", "medium")
 		.Generate())
     .WithEventId("demoevent")
-	.WithIpAddress("75.86.129.4")
+	.WithIpAddress("75.86.129.4", "45.67.2.4,34.56.3.2")
     .WithValidity(60000)
     .Generate(secretKey);
 
