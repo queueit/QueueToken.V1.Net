@@ -10,22 +10,22 @@ The token consists of two parts. Firstly, a header containing non-sensitive meta
   "enc": "AES256",
   "iss": 1526464517,
   "exp": 1526524517,
-  "ti": "159aba3e-55e1-4f54-b6ee-e5b943d7e885î,
+  "ti": "159aba3e-55e1-4f54-b6ee-e5b943d7e885‚Äù,
   "c": "ticketania", 
-  "e": "demoeventî,
+  "e": "demoevent‚Äù,
   "ip": "75.86.129.4",
   "xff": "45.67.2.4,34.56.3.2"
 }
 ```
-- `typ`: The type of the token. Value must be ìQFT1î. Required.
-- `enc`: Payload encryption algorithm. Value must be ìAES256î. Required.
+- `typ`: The type of the token. Value must be ‚ÄúQFT1‚Äù. Required.
+- `enc`: Payload encryption algorithm. Value must be ‚ÄúAES256‚Äù. Required.
 - `iss`: NumericDate of when token was issued. Required.
 - `exp`: NumericDate of when token expires. Optional.
 - `ti`: Unique Token ID (e.g. uuid). Used to uniquely identify tokens and restrict replay attacks. Required.
 - `c`: The Customer ID of the issuer. Token will only be valid on events on this account. Required.
 - `e`: The Event ID. If provided, token will only be valid on this event. Optional.
-- `ip`: The IP address the user the token is issued to. If provided, the IP address is validated before issuing the token. Optional.
-- `xff`: The X-Forwarded-For headerof the request when the token is issued. If provided, the X-Forwarded-For header is validated before issuing the token. Optional.
+- `ip`: The IP address of user the token is issued for. If provided, the IP address in the token is validated against the client IP before issuing a new Queue id. Optional.
+- `xff`: The X-Forwarded-For header of the request when the token is issued. Only used for logging. Optional.
 
 ### Token Payload
 ```
@@ -73,5 +73,5 @@ var tokenIdentifier = token.TokenIdentifier();
 ## Serialized Token
 > eyJ0eXAiOiJRVDEiLCJlbmMiOiJBRVMyNTYiLCJpc3MiOjE1MzQ3MjMyMDAwMDAsImV4cCI6MTUzOTEyOTYwMDAwMCwidGkiOiJhMjFkNDIzYS00M2ZkLTQ4MjEtODRmYS00MzkwZjZhMmZkM2UiLCJjIjoidGlja2V0YW5pYSIsImUiOiJteWV2ZW50In0.0rDlI69F1Dx4Twps5qD4cQrbXbCRiezBd6fH1PVm6CnVY456FALkAhN3rgVrh_PGCJHcEXN5zoqFg65MH8WZc_CQdD63hJre3Sedu0-9zIs.aZgzkJm57etFaXjjME_-9LjOgPNTTqkp1aJ057HuEiU
 
-The format of the token is [header].[payload].[hash] where each part is Base64Url encoded. The payload is AES 256 encrypted with the secret key supplied in the `.Generate(secretKey)` method. If the ìeî key is provided in the header, the secret key on the event must be used. If no ìeî key is provided the default key on the customer account must be used.
+The format of the token is [header].[payload].[hash] where each part is Base64Url encoded. The payload is AES 256 encrypted with the secret key supplied in the `.Generate(secretKey)` method. If the ‚Äúe‚Äù key is provided in the header, the secret key on the event must be used. If no ‚Äúe‚Äù key is provided the default key on the customer account must be used.
 The token is signed with SHA 256 using the same secret key.
