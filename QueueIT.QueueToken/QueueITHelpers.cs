@@ -62,7 +62,7 @@ namespace QueueIT.QueueToken
 
     internal static class Base64UrlEncoding
     {
-        public static String Encode(byte[] input)
+        public static string Encode(byte[] input)
         {
             return Convert.ToBase64String(input)
                 .Replace('+', '-')

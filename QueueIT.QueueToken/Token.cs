@@ -169,10 +169,10 @@ namespace QueueIT.QueueToken
         public static IEnqueueToken Parse(string tokenString, string secretKey)
         {
             if (string.IsNullOrEmpty(secretKey))
-                throw new ArgumentException("Invalid secret key", nameof(secretKey));
+                throw new ArgumentException("Empty secret key", nameof(secretKey));
 
             if (string.IsNullOrEmpty(tokenString))
-                throw new ArgumentException("Invalid token", nameof(tokenString));
+                throw new ArgumentException("Empty token", nameof(tokenString));
 
             var tokenParts = tokenString.Split('.');
             var headerPart = tokenParts[0];
@@ -180,9 +180,9 @@ namespace QueueIT.QueueToken
             var hashPart = tokenParts[2];
 
             if (string.IsNullOrEmpty(headerPart))
-                throw new ArgumentException("Invalid token", nameof(tokenString));
+                throw new ArgumentException("Empty header part of enqueue token", nameof(tokenString));
             if (string.IsNullOrEmpty(hashPart))
-                throw new ArgumentException("Invalid token", nameof(tokenString));
+                throw new ArgumentException("Empty hash part of enqueue token", nameof(tokenString));
 
             var token = headerPart + "." + payloadPart;
 

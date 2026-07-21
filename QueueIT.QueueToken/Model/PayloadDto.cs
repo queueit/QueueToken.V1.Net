@@ -14,13 +14,15 @@ namespace QueueIT.QueueToken.Model
         public string Key { get; set; }
         [DataMember(Name = "cd", Order = 3, EmitDefaultValue = false)]
         public Dictionary<string, string> CustomData { get; set; }
+        [DataMember(Name = "O", Order = 4, EmitDefaultValue = false)]
+        public string Origin { get; set; }
 
         internal static PayloadDto DeserializePayload(string input, string secretKey, string tokenIdentifier)
         {
             var headerEncrypted = Base64UrlEncoding.Decode(input);
             var decrypted = AesEncryption.DecryptPayload(secretKey, tokenIdentifier, headerEncrypted);
 
-            var jsonSerializer = new DataContractJsonSerializer(typeof(Model.PayloadDto), new DataContractJsonSerializerSettings()
+            var jsonSerializer = new DataContractJsonSerializer(typeof(PayloadDto), new DataContractJsonSerializerSettings()
             {
                 UseSimpleDictionaryFormat = true
             });
